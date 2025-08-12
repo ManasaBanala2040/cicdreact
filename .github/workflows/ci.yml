@@ -1,4 +1,4 @@
-name: CI/CD React App
+name: React CI
 
 on:
   push:
@@ -6,41 +6,27 @@ on:
   pull_request:
     branches: [main]
 
-permissions:
-  contents: write  
-
 jobs:
-  build-and-deploy:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: '18'
+
+      - name: npm ci
+        run: npm ci
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install vite@latest
 
       - name: Run tests
         run: npm test --if-present
 
-      - name: Build the project
-        run: npm run build
-
-      # Configure Git identity
-      - name: Configure Git
-        run: |
-          git config --global user.name "suneethabulla"
-          git config --global user.email "suneethabulla@example.com"
-
-      # Deploy to GitHub Pages
-      - name: Deploy to GitHub Pages
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
-          npm run deploy
+      - name: Build project
+        run: npm run build --if-present
